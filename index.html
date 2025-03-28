@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Children's Book</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="book-container">
+        <div class="controls">
+            <button id="prev-btn" disabled>Previous Page</button>
+            <button id="next-btn">Next Page</button>
+        </div>
+        
+        <div class="book">
+            <!-- First page -->
+            <div class="page active" id="page1">
+                <div class="page-content">
+                    <h1>Page 1</h1>
+                    <p>Welcome to this magical adventure!</p>
+                    <div class="image-container">
+                        <img src="images/01.png" alt="Page 1">
+                    </div>
+                    <button class="sound-btn" data-sound="welcome">Play Sound</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="welcome" src="sounds/welcome.mp3"></audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>
