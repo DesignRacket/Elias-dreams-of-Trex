@@ -11,7 +11,7 @@ An interactive children's book with images and sounds, created with HTML, CSS, a
 
 ## How to Use
 
-1. Visit the GitHub Pages site: https://designracket.github.io/interactive-childrens-book/
+1. Visit the GitHub Pages site: https://designracket.github.io/Elias-dreams-of-Trex
 2. Navigate through the story using the "Previous Page" and "Next Page" buttons
 3. Click the "Play Sound" button on each page to hear narration or sound effects
 
