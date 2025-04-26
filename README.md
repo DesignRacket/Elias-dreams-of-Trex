@@ -1,50 +1,63 @@
 # Interactive Children's Book
 
-An interactive children's book with images and sounds, created with HTML, CSS, and JavaScript. This project is designed to be viewed on tablets or computers.
+An interactive storybook web application designed for children, featuring images and sounds.
 
 ## Features
 
-- Simple page navigation
-- Images for each page
-- Sound effects that play when buttons are clicked
-- Responsive design that works on iPads and other tablets
+- Displays book pages one at a time with smooth transitions
+- Audio narration for each page with play/pause controls
+- Navigation buttons and keyboard controls
+- Swipe gestures for mobile devices
+- Responsive design that works on any device
+- Fun confetti animations
+- Child-friendly interface with playful colors and fonts
 
 ## How to Use
 
-1. Visit the GitHub Pages site: https://designracket.github.io/Elias-dreams-of-Trex
-2. Navigate through the story using the "Previous Page" and "Next Page" buttons
-3. Click the "Play Sound" button on each page to hear narration or sound effects
+### Viewing in a Browser
 
-## Adding Your Content
+Simply open `index.html` in any web browser to use the interactive book.
 
-### Images
-Replace the placeholder images in the `images` folder with your own illustrations:
-- Upload your illustrations to the `images` folder
-- Update the image paths in the script.js file
-- Recommended image size: 800px wide by 600px tall for optimal viewing on tablets
+### Running with a Local Server
 
-### Sounds
-Add your own MP3 files to the `sounds` folder:
-- Create a `sounds` folder in the repository
-- Upload MP3 files with the names referenced in script.js:
-  - welcome.mp3
-  - forest.mp3
-  - discovery.mp3
-  - magic.mp3
-  - ending.mp3
+If you have Node.js installed, you can run a local server:
 
-### Story Content
-Edit the `bookPages` array in the script.js file to change the story text, titles, and file references.
+1. Open a terminal/command prompt in the project directory
+2. Run `npm start` or `node serve.js`
+3. Open your browser and navigate to `http://localhost:3000`
 
-## Sharing the Book
+This method is useful if you want to view the book from other devices on your network.
 
-The book is hosted on GitHub Pages and can be accessed through any web browser. Share the link with friends and family to let them read your interactive story on their iPad or other device.
+## Navigation
 
-## Enabling GitHub Pages
+- Move through the book using:
+  - The "Previous" and "Next" buttons
+  - Left and right arrow keys on keyboard
+  - Swipe left or right on touch devices
+- Play the audio narration for each page by clicking the green sound button
+- Enjoy the confetti animation at the beginning and end of the book
 
-To host your book on GitHub Pages:
-1. Go to your repository settings
-2. Scroll down to the "GitHub Pages" section
-3. Select the branch to deploy (usually "main")
-4. Save the settings
-5. Your book will be available at https://[your-username].github.io/interactive-childrens-book/
+## Technical Information
+
+- No server required - runs entirely in the browser
+- Responsive design works on desktop, tablet, and mobile devices
+- Uses HTML5 audio for sound playback
+- Font Awesome icons for button graphics
+- CSS animations for visual effects
+
+## Directory Structure
+
+- `index.html` - The main application file
+- `images/` - Contains all book page images (PNG format)
+- `sounds/` - Contains audio narration files (MP3 format)
+- `serve.js` - Simple Node.js server for local hosting
+- `package.json` - Node.js package configuration
+
+## Compatibility
+
+Works on all modern browsers including:
+- Chrome
+- Firefox
+- Safari
+- Edge
+- Mobile browsers

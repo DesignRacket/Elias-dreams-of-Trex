@@ -4,32 +4,456 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Children's Book</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f8f4e5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .book-container {
+            max-width: 100%;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .page-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+            background-color: white;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .btn {
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: #ffaa33;
+            transform: scale(1.05);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .sound-btn {
+            background-color: #4CAF50;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .sound-btn i {
+            font-size: 24px;
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Loading animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #f8f4e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ff9900;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Confetti effect */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            animation: fall 5s ease-out forwards;
+            z-index: -1;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-container {
+                height: 60vh;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+            
+            .sound-btn {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-container {
+                height: 50vh;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <div class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
     <div class="book-container">
-        <div class="controls">
-            <button id="prev-btn" disabled>Previous Page</button>
-            <button id="next-btn">Next Page</button>
-        </div>
+        <div class="page-container" id="pageContainer"></div>
         
-        <div class="book">
-            <!-- First page -->
-            <div class="page active" id="page1">
-                <div class="page-content">
-                    <h1>Page 1</h1>
-                    <p>Welcome to this magical adventure!</p>
-                    <div class="image-container">
-                        <img src="images/01.png" alt="Page 1">
-                    </div>
-                    <button class="sound-btn" data-sound="welcome">Play Sound</button>
-                </div>
-            </div>
+        <div class="controls">
+            <button class="btn" id="prevBtn"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn sound-btn" id="playSound"><i class="fas fa-volume-up"></i></button>
+            <button class="btn" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
-    <audio id="welcome" src="sounds/welcome.mp3"></audio>
-    
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Define image and sound files in order
+            const images = [
+                'images/01.png',
+                'images/02.png',
+                'images/03.png',
+                'images/04.png',
+                'images/05.png',
+                'images/06.png',
+                'images/07.png',
+                'images/08.png',
+                'images/09.png',
+                'images/10.png',
+                'images/11.png',
+                'images/12.png',
+                'images/13.png',
+                'images/14.png',
+                'images/15.png',
+                'images/16.png',
+                'images/17.png',
+                'images/18.png',
+                'images/19.png',
+                'images/20.png',
+                'images/21.png',
+                'images/22.png',
+                'images/23.png'
+            ];
+            
+            // Replace the sounds array with pageSounds object
+            const pageSounds = {
+                0: ['sounds/01 Title.mp3','sounds/01 roar.mp3'],
+                1: ['sounds/02.mp3','sounds/deliciousos panqueques.mp3'],
+                2: ['sounds/03.mp3','sounds/03 boat.mp3'],
+                3: ['sounds/04.mp3','sounds/04 game.mp3'],
+                4: ['sounds/05.mp3','sounds/05 hiking.mp3'],
+                5: ['sounds/06.mp3','sounds/06 swoosh.mp3'],
+                6: ['sounds/07.mp3','sounds/07 blanket.mp3'],
+                7: ['sounds/08.mp3','sounds/08 glow.mp3'],
+                8: ['sounds/09.mp3'],
+                9: ['sounds/10.mp3','sounds/10 gasp.mp3'],
+                10: ['sounds/11.mp3','sounds/11 smash.mp3'],
+                11: ['sounds/12.mp3'],
+                12: ['sounds/13.mp3'],
+                13: ['sounds/14.mp3'],
+                14: ['sounds/15.mp3'],
+                15: ['sounds/16.mp3'],
+                16: ['sounds/17.mp3'],
+                17: ['sounds/18.mp3','sounds/18 kick.mp3'],
+                18: ['sounds/19.mp3'],
+                19: ['sounds/20.mp3'],
+                20: ['sounds/21.mp3'],
+                21: ['sounds/22.mp3'],
+                22: ['sounds/23.mp3'],
+            };
+            
+            let currentPage = 0;
+            let audio = new Audio();
+            const pageContainer = document.getElementById('pageContainer');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const playSound = document.getElementById('playSound');
+            const loading = document.querySelector('.loading');
+            
+            // Create pages
+            function createPages() {
+                images.forEach((img, index) => {
+                    const page = document.createElement('div');
+                    page.className = 'page';
+                    if (index === 0) page.classList.add('active');
+                    
+                    const image = document.createElement('img');
+                    image.src = img;
+                    image.alt = `Page ${index + 1}`;
+                    image.onload = function() {
+                        // Once all images are loaded, hide loading screen
+                        if (index === images.length - 1) {
+                            setTimeout(() => {
+                                loading.style.display = 'none';
+                                createConfetti();
+                            }, 500);
+                        }
+                    };
+                    
+                    const pageNumber = document.createElement('div');
+                    pageNumber.className = 'page-number';
+                    pageNumber.textContent = `${index + 1} / ${images.length}`;
+                    
+                    page.appendChild(image);
+                    page.appendChild(pageNumber);
+                    pageContainer.appendChild(page);
+                });
+            }
+            
+            // Navigation functions
+            function showPage(index) {
+                const pages = document.querySelectorAll('.page');
+                
+                // Hide all pages
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Show the target page
+                pages[index].classList.add('active');
+                
+                // Update buttons
+                prevBtn.disabled = index === 0;
+                nextBtn.disabled = index === images.length - 1;
+                
+                // Stop any playing audio
+                audio.pause();
+                audio.currentTime = 0;
+                
+                // Reset play button
+                playSound.innerHTML = '<i class="fas fa-volume-up"></i>';
+                playSound.dataset.playing = 'false';
+            }
+            
+            // Modified toggleSound function to handle multiple sounds
+            function toggleSound() {
+                if (audio.paused || audio.currentTime === 0) {
+                    const pageSoundsList = pageSounds[currentPage] || [];
+                    let soundIndex = 0;
+
+                    function playNextSound() {
+                        if (soundIndex < pageSoundsList.length) {
+                            audio.src = pageSoundsList[soundIndex];
+                            audio.play();
+                            playSound.innerHTML = '<i class="fas fa-pause"></i>';
+                            playSound.dataset.playing = 'true';
+                            
+                            audio.onended = function() {
+                                soundIndex++;
+                                playNextSound();
+                            };
+                        } else {
+                            // All sounds finished
+                            playSound.innerHTML = '<i class="fas fa-volume-up"></i>';
+                            playSound.dataset.playing = 'false';
+                        }
+                    }
+                    
+                    playNextSound();
+                } else {
+                    audio.pause();
+                    playSound.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    playSound.dataset.playing = 'false';
+                }
+            }
+            
+            // Create confetti effect
+            function createConfetti() {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 5 + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Remove confetti after animation ends
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }
+            }
+            
+            // Event listeners
+            prevBtn.addEventListener('click', function() {
+                if (currentPage > 0) {
+                    currentPage--;
+                    showPage(currentPage);
+                }
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                if (currentPage < images.length - 1) {
+                    currentPage++;
+                    showPage(currentPage);
+                    
+                    // Create confetti on last page
+                    if (currentPage === images.length - 1) {
+                        createConfetti();
+                    }
+                }
+            });
+            
+            playSound.addEventListener('click', toggleSound);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    prevBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    nextBtn.click();
+                } else if (e.key === ' ') {
+                    // Space bar for sound
+                    toggleSound();
+                }
+            });
+            
+            // Swipe gestures for mobile
+            let touchstartX = 0;
+            let touchendX = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+            });
+            
+            document.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                const threshold = 75; // minimum distance for swipe
+                
+                if (touchendX < touchstartX - threshold) {
+                    // Swipe left, go to next page
+                    nextBtn.click();
+                }
+                
+                if (touchendX > touchstartX + threshold) {
+                    // Swipe right, go to previous page
+                    prevBtn.click();
+                }
+            }
+            
+            // Initialize
+            createPages();
+            showPage(currentPage);
+        });
+    </script>
 </body>
 </html>
