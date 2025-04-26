@@ -1,0 +1,18 @@
+{
+  "name": "interactive-childrens-book",
+  "version": "1.0.0",
+  "description": "Interactive storybook for children with images and sounds",
+  "main": "serve.js",
+  "scripts": {
+    "start": "node serve.js"
+  },
+  "keywords": [
+    "children",
+    "book",
+    "interactive",
+    "storybook",
+    "html5"
+  ],
+  "author": "",
+  "license": "MIT"
+} 
